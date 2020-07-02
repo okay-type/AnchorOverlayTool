@@ -305,6 +305,15 @@ class AnchorOverlay(BaseWindowController):
         self.w.showAnchors.setSelection([])
         self.w.open()
 
+        # set position from saved
+        (wminx, wminy), (areaW, areaH) = self.w.getNSWindow().frame()
+        v = getExtensionDefault("%s.%s" % (extensionID, "posSize"))
+        if v == None:
+            v = (wminx, wminy), (areaW, areaH)
+        self.w.getNSWindow().setFrame_display_animate_(v, True, False)
+
+
+
     # Observers
 
     def addObservers(self):
@@ -532,6 +541,12 @@ class AnchorOverlay(BaseWindowController):
         # print("     Draw: %0.1f ms" % (1000 * (stop - start)))
 
     def windowCloseCallback(self, sender):
+        # save window position
+        (wminx, wminy), (areaW, areaH) = self.w.getNSWindow().frame()
+        v = (wminx, wminy), (areaW, areaH)
+        setExtensionDefault(
+            "%s.%s" % (extensionID, "posSize"), v
+        )
         self.removeObservers()
         setExtensionDefault(
             "%s.%s" % (extensionID, "hide"), self.fontAnchors.hideLists
